@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Stats</title>
+  <link rel="stylesheet" href="gameStats.css">
+</head>
+<body>
+  <h1>Game Stats</h1>
+  <div>
+    <h2>Rock Paper Scissors</h2><br>
+    <button class="remove-btn" onclick="deleteRecord('record')">Reset</button><br>
+    <p class="rps-record"></p>
+  </div>
+  <div>
+    <h2>Hangman</h2><br>
+    <button class="remove-btn" onclick="deleteRecord('hangmanRecord')">Reset</button><br>
+    <p class="hang-record"></p>
+  </div>
+  <div>
+    <h2>Tic-Tac-Toe</h2><br>
+    <button class="remove-btn" onclick="deleteRecord('ttt-record')">Reset</button><br>
+    <p class="tic-record"></p>
+  </div>
+  <script src="gameStats.js"></script>
+</body>
+</html>
