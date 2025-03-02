@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HangMan</title>
+  <link rel="stylesheet" href="hangman.css">
+  <script src="hangman.js"></script>
+</head>
+<body onload="generateCatagory(); generateWord();">
+  <div class="catagory"></div><br>
+  <div class="word"></div><br>
+  <div class="characters"></div>
+  <div class="trash"></div><br>
+  <div class="result"></div>
+  <div class="record"></div>
+  <button class="reset-btn" onclick ="delete localStorage.getItem('hangmanRecord');record = {win:0,lose:0}; document.querySelector('.record').innerHTML =`Wins: ${record.win} Losses: ${record.lose}`;">Reset Score</button>
+</body>
+</html>

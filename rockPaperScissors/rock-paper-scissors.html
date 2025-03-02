@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rock Paper Scissors</title>
+    <link rel="stylesheet" href="rock-paper-scissors.css">
+  </head>
+  <body>
+    <p>Rock Paper Scissors</p>
+    <button title="Choose Rock" onclick="
+   cpuMove();
+    if (computerMove === 'Rock') {
+      result = 'tied'
+      record.ties++
+    } else if (computerMove === 'Paper'){
+      result = 'lose'
+      record.losses++
+    } else if(computerMove === 'Scissors'){
+      result = 'win'
+      record.wins++
+    }
+    document.querySelector('.result').textContent =`You picked Rock, the computer picked ${computerMove}. You ${result}`; ">Rock</button>
+
+
+    <button title="Choose Paper" onclick="
+    cpuMove();
+     
+    if (computerMove === 'Rock') {
+      result = 'win'
+      record.wins++
+    } else if (computerMove === 'Paper'){
+      result = 'tied'
+      record.ties++
+    } else if(computerMove === 'Scissors'){
+      result = 'lose'
+      record.losses++
+    }
+    document.querySelector('.result').textContent = `You picked Paper, the computer picked ${computerMove}. You ${result}`;">Paper</button>
+
+
+    <button title="Choose Scissors" onclick="
+    cpuMove()
+    
+    if (computerMove === 'Rock') {
+      'stalemate';
+      result = 'lose'
+      record.losses++
+    } else if (computerMove === 'Paper'){
+      result = 'win'
+      record.wins++
+    } else if(computerMove === 'Scissors'){
+      result = 'tied'
+      record.ties++
+    }
+    document.querySelector('.result').textContent =`You picked Scissors, the computer picked ${computerMove}. You ${result}`;">Scissors</button><br>
+    <img src="image.png" class="rps-photo"><br>
+    <div class="result"></div><br>
+    <div class="record"></div><br>
+    <div class="score"></div>
+
+    <script>
+      function cpuMove() {
+      computerMove=''
+      result=''
+      const randomNumber = Math.random();
+      if(randomNumber >= 0 && randomNumber < 1/3){
+     computerMove = 'Rock';
+    } else if(randomNumber >= 1/3 && randomNumber < 2/3){
+      console.log('Paper');
+      computerMove ='Paper';
+    }
+    else if (randomNumber >= 2/3 && randomNumber < 1){
+     console.log('Scissors');
+     computerMove = 'Scissors';
+    }
+    localStorage.setItem('record', JSON.stringify(record));
+     document.querySelector('.record').textContent = `Wins:${record.wins} losses:${record.losses} ties:${record.ties}`
+     document.querySelector('.result').textContent = `You picked Scissors, the computer picked ${computerMove}. You ${result}`
+     document.querySelector('.score').textContent = `Score:${score = record.wins - record.losses}. Your score is calculated by subtracting your losses from your wins`
+    }
+        let result = ''
+        let computerMove = Math.random()
+        const record = JSON.parse(localStorage.getItem('record')) || {
+          wins : 0,
+          losses : 0,
+          ties : 0,
+        }
+       let score = record.wins - record.losses
+      
+    </script>  
+  </body>  
+</html>  

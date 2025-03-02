@@ -1,0 +1,45 @@
+body{
+  font-family: Arial;
+  background-color: black;
+  color:white;
+  font-weight:bold;
+}
+.result{
+  font-size:30px;
+}
+.move-button{
+  height:38px;
+  background-color:burlywood;
+  border-color:white;
+  color:white;
+  font-weight:bold;
+  border:solid;
+  border-radius:8px;
+  cursor:pointer;
+}
+.move-button:hover{
+  opacity:0.8;
+  transition:opacity, 0.15s;
+}
+.move-button:active{
+  opacity:0.6;
+  transition:opacity, 0.15s;
+}
+.misc{
+  cursor:pointer;
+  background-color: whitesmoke;
+  color:black;
+  font-weight:bold;
+  height:38px;
+  padding:10px;
+  border-color:gray;
+  border:solid;
+}
+.misc:hover{
+  opacity:0.8;
+  transition:opacity, 0.15s;
+}
+.misc:active{
+  opacity:0.6;
+  transition:opacity, 0.15s;
+}

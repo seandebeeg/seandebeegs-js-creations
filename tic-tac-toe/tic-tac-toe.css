@@ -1,0 +1,60 @@
+body{
+  background-color:black;
+  color:white;
+  font-family:Arial;
+}
+.space{
+  height:75px;
+  width:75px;
+  cursor:pointer;
+  margin-top:5px;
+  font-size: 25px;
+  line-height: 75px; 
+  text-align: center; 
+  display: inline-block; 
+  vertical-align: middle; 
+  color:white;
+  border-color: white;
+  background-color:black;
+  border:solid;
+}
+.space:hover{
+  opacity:0.8;
+  transition:opacity, 0.15s;
+}
+.space:active{
+  opacity:0.6;
+  transition:opacity, 0.15s;
+}
+.game{
+  text-align:center;
+}
+.misc-button{
+  cursor:pointer;
+  height:38px;
+  background-color: black;
+  border: solid;
+  border-color:white;
+  color:white;
+  margin-right:5px;
+  margin-top:5px;
+  font-weight:bold;
+}
+.misc-button:hover{
+  opacity:0.8;
+  transition:opacity, 0.15s;
+}
+.misc-button:active{
+  opacity:0.6;
+  transition:opacity, 0.15s;
+} 
+.record{
+  font-size:20px;
+  margin-top:5px;
+  font-weight:bold;
+}
+.result{
+  font-size:25px;
+  margin-top:5px;
+  font-weight:bold
+}

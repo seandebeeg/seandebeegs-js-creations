@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Black Jack</title>
+  <link rel="stylesheet" href="blackJack.css">
+</head>
+<body>
+  <div class="deck"></div>
+  <div class="playerCards">
+    <h1>Pre-Game: Player Count</h1>
+    <form class="playerForm">
+      <select id="playerCount">
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+      <label for="playerCount"></label>
+      <button type ="submit" onclick="event.preventDefault(); dealCards()">Confirm</button>
+    </form>
+  </div>
+  <script src="blackJack.js"></script>
+</body>
+</html>

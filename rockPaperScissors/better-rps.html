@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id ="tabName">Rock Paper Scissors</title>
+  <link rel="stylesheet" href="better-rps.css">
+  <script src="better-rps.js"></script>
+</head>
+<body>
+  <h1>Rock Paper Scissors</h1>
+  <button class="move-button"onclick ="pickComputerMove();playerMove('rock');">Rock</button>
+  <button class="move-button"onclick="pickComputerMove();playerMove('paper');">Paper</button>
+  <button class="move-button"onclick="pickComputerMove(); playerMove('scissors')">Scissors</button><br>
+  <div class="result" id="result">
+
+  </div>
+  <button  id="autoplay"class ="misc"onclick="autoPlay()">Auto Play</button>
+  <button class ="misc"onclick="localStorage.clear();record = {wins:0,losses:0,ties:0,score:0}">Reset Score</button>
+</body>
+</html>

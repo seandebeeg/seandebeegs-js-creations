@@ -1,0 +1,78 @@
+body{
+  background-color: black;
+  color:white;
+  font-family:Arial, Helvetica, sans-serif
+}
+
+.center {
+  text-align: center;
+}
+
+.spec {
+  font-family: Arial, Helvetica, sans-serif;
+  opacity: 0;
+  transition: opacity 1s;
+  font-size:15px;
+  font-weight:bold;
+}
+
+.spec.visible {
+  opacity: 1;
+}
+
+.phoneSelector{
+  height:38px;
+  color:white;
+  background-color:black;
+  border-color: white;
+  border:solid;
+  font-size:15px;
+  width:300px;
+  text-align:center;
+  margin-bottom:15px;
+  margin-right:-90px;
+  border-radius:25px;
+}
+.phoneSelector::placeholder{
+  color:white;
+  opacity:0.75;
+}
+
+.play-again{
+  height:38px;
+  border-color:white;
+  color:white;
+  background-color:black;
+  cursor:pointer;
+  border:solid;
+}
+.play-again:hover{
+  transition:opacity 0.15s;
+  opacity:0.8;
+}
+.play-again:active{
+  transition:opacity 0.15s;
+  opacity:0.6;
+}
+
+.submit{
+  height:38px; 
+  border-color:black;
+  color:white;
+  background-color:black;
+  cursor:pointer;
+  border-radius: 25px;
+  border:solid;
+}
+.submit:hover{
+  transition:opacity 0.15s;
+  transition:background-color 0.15s;
+  opacity:0.8;
+  border-color: white;
+}
+.submit:active{
+  transition:opacity 0.15s;
+  transition:background-color 0.15s;
+  opacity:0.6;
+  border-color: white;
+}
