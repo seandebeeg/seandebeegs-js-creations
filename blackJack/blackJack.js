@@ -11,7 +11,6 @@ let playerFour = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twenty
 let playerFive = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1};
 let cards = [];
 let previousBetValue = 1;
-let playerOneTurn = true;
 
 function dealCards() {
   players = document.getElementById('playerCount').value;
@@ -43,18 +42,33 @@ function dealCards() {
   }
   }
   document.querySelector('.playerCards').innerHTML = `${playerOne.cards[0].photo} <img src ="card-facedown.jpg" class="player-cards"><br> <button onclick="flipCard()">Opening Bet:${previousBetValue}</button>`;
+  playAudio('sounds/woosh.mp3')
 }
 function flipCard() {
   playerOne.chips.oneDollar -= previousBetValue;
   previousBetValue += 1;
   document.querySelector('.playerCards').innerHTML = `<button onclick="check(true,${previousBetValue})" class="action-button">Meet!</button> <button onclick="check(true,${previousBetValue + 1})" class="action-button">Raise!</button><button onclick="check(false)"class="action-button">Stand!</button><br> ${playerOne.cards[0].photo} ${playerOne.cards[1].photo}`;
+  playAudio('sounds/woosh.mp3')
   document.querySelector('.deck').innerHTML = '<img src="card-facedown.jpg" class="player-cards"><br>';
   checkForBust(playerOne);
 }
 
 function check(didHit, betValue) {
   if (!didHit) {
-    return;
+    let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards, playerFive.cards]
+      .slice(0, players).map(cards => getHandValue({cards})); 
+    
+    const maxHand = Math.max(...allHands);
+    const winners = allHands
+      .map((value, index) => ({value, index}))
+      .filter(hand => hand.value === maxHand && hand.value <= 21);
+    
+    if (winners.length > 0) {
+      document.querySelector('.results').innerHTML = 
+        `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with ${maxHand}`;
+    } else {
+      document.querySelector('.results').innerHTML = 'Everyone busted!';
+    }
   } else {
     playerOne.chips.oneDollar -= betValue;
     if (playerOne.chips.oneDollar <= 0 || playerOne.chips.oneDollar < betValue) {
@@ -71,9 +85,12 @@ function check(didHit, betValue) {
   }
 }
 
-function betStatus(){
-  
-} 
+function playAudio(filePath){
+  audio = new Audio(filePath);
+  audio.play().catch(err =>{
+    console.error('Sound Error:',err)
+  })
+}
 
 function getCardValue(card) {
   if (card.name === 'ace') {
@@ -107,7 +124,6 @@ function getHandValue(player){
 
 function checkForBust(player){
   const handValue = getHandValue(player)
-  console.log(handValue)
   if(handValue === 21){
     document.querySelector('.results').innerHTML = `You got a blackjack`
   }else if(handValue > 21){
