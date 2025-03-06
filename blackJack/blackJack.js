@@ -27,20 +27,20 @@ function dealCards() {
     }
   }
   for(let i=0; i<cardsPerPlayer; i++){
-    playerOne.cards.push(cards[i]);
-    playerTwo.cards.push(cards[i + 1]);
-    cards.splice(0,3);
-  if (players > 2) {
-    playerThree.cards.push(cards[i + 2]);
-    cards.shift();
-  } else if (players > 3) {
-    playerFour.cards.push(cards[i + 3]);
-    cards.shift();
-  } else if (players > 4) {
-    playerFive.cards.push(cards[i + 4]);
-    cards.shift();
+   playerOne.cards.push(cards[i]);
+   playerTwo.cards.push(cards[i + 1]);
+   cards.splice(0,3);
+    if (players > 2) {
+      playerThree.cards.push(cards[i + 2]);
+      cards.shift();
+    } else if (players > 3) {
+      playerFour.cards.push(cards[i + 3]);
+      cards.shift();
+    } else if(players > 4){
+      playerFive.cards.push(cards[i+4])
+    }
   }
-  }
+  document.querySelector('.initial-page').innerHTML = ``
   document.querySelector('.playerCards').innerHTML = `${playerOne.cards[0].photo} <img src ="card-facedown.jpg" class="player-cards"><br> <button onclick="flipCard()">Opening Bet:${previousBetValue}</button>`;
   playAudio('sounds/woosh.mp3')
 }
@@ -55,7 +55,7 @@ function flipCard() {
 
 function check(didHit, betValue) {
   if (!didHit) {
-    let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards, playerFive.cards]
+    let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards]
       .slice(0, players).map(cards => getHandValue({cards})); 
     
     const maxHand = Math.max(...allHands);
@@ -126,9 +126,12 @@ function checkForBust(player){
   const handValue = getHandValue(player)
   if(handValue === 21){
     document.querySelector('.results').innerHTML = `You got a blackjack`
+    document.querySelector('.playerTwo').innerHTML = playerTwo.cards[0].photo + playerTwo.cards[1].photo; 
   }else if(handValue > 21){
     document.querySelector('.results').innerHTML = `You have busted`
+    document.querySelector('.playerTwo').innerHTML = playerTwo.cards[0].photo + playerTwo.cards[1].photo; 
   }else{
     document.querySelector('.results').innerHTML = `Hand Total: ${handValue}`
+    document.querySelector('.playerTwo').innerHTML = playerTwo.cards[0].photo + '<img src="card-facedown.jpg" class="playerTwo">'; 
   }
 }
