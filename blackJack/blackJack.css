@@ -23,6 +23,7 @@ body{
   border-radius: 5px;
   cursor:pointer;
   font-weight:bold;
+  margin-right:10px;
 }
 .action-button:hover{
   opacity:0.8;
@@ -31,4 +32,25 @@ body{
 .action-button:active{
   opacity:0.6;
   transition:opacity 0.15s;
+}
+.playerTwo{
+  transform:rotate(180deg);
+  text-align:center;
+  height:100px;
+  margin-right:10px;
+}
+.playerThree{
+  transform:rotate(270deg);
+  text-align:left;
+  height:100px;
+  margin-top:10px;
+}
+.playerFour{
+  transform:rotate(90deg);
+  text-align:right;
+  height:100px;
+  margin-top:10px;
+}
+.initial-page{
+  text-align: center;
 }
