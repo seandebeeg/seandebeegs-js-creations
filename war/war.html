@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>War Online</title>
+  <link rel="stylesheet" href="war.css">
+  <link rel="import" href="deck-of-cards.zip">
+</head>
+<body>
+  <div class="selector" id="selector">
+    <form>
+      <label for="player"> Choose Player Amount</label>
+      <select id="player" name="player">
+        <option value="2">2 (default)</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+      <button onclick="calculateCardsPerPlayer(); event.preventDefault(); dealCards();" type="submit">Generate Game</button>
+    </form>
+  </div>
+  <div class="pile"></div><br>
+  <div class="player" id="player"></div>
+  <div class="result"></div>
+  <script src="war.js"></script>
+</body>
+</html>

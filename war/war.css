@@ -1,0 +1,26 @@
+body{
+  color:white;
+  background-color:black;
+}
+.result{
+  font-size:40px;
+}
+.player{
+  text-align:center;
+}
+.flip-button{
+  height:38px;
+  cursor:pointer;
+  background-color:rgb(166, 40, 40);
+  border:solid;
+  border-color:white;
+  margin:top,bottom 5px;
+}
+.flip-button:hover{
+  opacity:0.8;
+  transition:opacity, 0.15s;
+}
+.flip-button:active{
+  opacity:0.6;
+  transition:opacity, 0.15s;
+}
