@@ -42,45 +42,52 @@ function dealCards() {
   }
   document.querySelector('.initial-page').innerHTML = ``
   document.querySelector('.playerCards').innerHTML = `${playerOne.cards[0].photo} <img src ="card-facedown.jpg" class="player-cards"><br> <button onclick="flipCard()">Opening Bet:${previousBetValue}</button>`;
-  playAudio('sounds/woosh.mp3')
+  playAudio('sounds/woosh.mp3');
 }
 function flipCard() {
   playerOne.chips.oneDollar -= previousBetValue;
   previousBetValue += 1;
-  document.querySelector('.playerCards').innerHTML = `<button onclick="check(true,${previousBetValue})" class="action-button">Meet!</button> <button onclick="check(true,${previousBetValue + 1})" class="action-button">Raise!</button><button onclick="check(false)"class="action-button">Stand!</button><br> ${playerOne.cards[0].photo} ${playerOne.cards[1].photo}`;
+  document.querySelector('.playerCards').innerHTML = `<button onclick="check(true,${previousBetValue},playerOne)" class="action-button">Meet!</button> <button onclick="check(true,${previousBetValue + 1},playerOne)" class="action-button">Raise!</button><button onclick="check(false)"class="action-button">Stand!</button><br> ${playerOne.cards[0].photo} ${playerOne.cards[1].photo}`;
   playAudio('sounds/woosh.mp3')
   document.querySelector('.deck').innerHTML = '<img src="card-facedown.jpg" class="player-cards"><br>';
   checkForBust(playerOne);
 }
 
-function check(didHit, betValue) {
-  if (!didHit) {
-    let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards]
-      .slice(0, players).map(cards => getHandValue({cards})); 
-    
-    const maxHand = Math.max(...allHands);
-    const winners = allHands
-      .map((value, index) => ({value, index}))
-      .filter(hand => hand.value === maxHand && hand.value <= 21);
-    
-    if (winners.length > 0) {
-      document.querySelector('.results').innerHTML = 
-        `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with ${maxHand}`;
+function check(didHit, betValue, player) {
+  if(player == undefined){
+    console.error('Player not found :', player)
+  }else{
+    if (!didHit) {
+      let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards]
+        .slice(0, players).map(cards => getHandValue({cards})); 
+      
+      const maxHand = Math.max(...allHands);
+      const winners = allHands
+        .map((value, index) => ({value, index}))
+        .filter(hand => hand.value === maxHand && hand.value <= 21);
+      if (winners.length > 0|| winners.length > 1) {
+        if(winners[0].length > winners[1]){
+          document.querySelector('.results').innerHTML = 
+          `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with ${maxHand}`;
+        }
+        document.querySelector('.results').innerHTML = 
+          `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with ${maxHand}`;
+      } else {
+        document.querySelector('.results').innerHTML = 'Everyone busted!';
+      }
     } else {
-      document.querySelector('.results').innerHTML = 'Everyone busted!';
-    }
-  } else {
-    playerOne.chips.oneDollar -= betValue;
-    if (playerOne.chips.oneDollar <= 0 || playerOne.chips.oneDollar < betValue) {
-      alert('You do not have enough money to bet');
-    } else {
-      playerOne.cards.push(cards.shift());
-      playerOne.i++;
       playerOne.chips.oneDollar -= betValue;
-      previousBetValue = betValue;
-      document.querySelector('.playerCards').innerHTML += playerOne.cards[playerOne.i].photo;
-      playerOne.cards.forEach((card, index) => { if (card === undefined) { delete playerOne.cards[index] } });
-      checkForBust(playerOne);
+      if (playerOne.chips.oneDollar <= 0 || playerOne.chips.oneDollar < betValue) {
+        alert('You do not have enough money to bet');
+      } else {
+        player.cards.push(cards.shift());
+        player.i++;
+        player.chips.oneDollar -= betValue;
+        previousBetValue = betValue;
+        document.querySelector('.playerCards').innerHTML += playerOne.cards[playerOne.i].photo;
+        playerOne.cards.forEach((card, index) => { if (card === undefined) { delete playerOne.cards[index] } });
+        checkForBust(playerOne);
+      }
     }
   }
 }
@@ -126,12 +133,30 @@ function checkForBust(player){
   const handValue = getHandValue(player)
   if(handValue === 21){
     document.querySelector('.results').innerHTML = `You got a blackjack`
-    document.querySelector('.playerTwo').innerHTML = playerTwo.cards[0].photo + playerTwo.cards[1].photo; 
+    document.querySelector('.player2').innerHTML = playerTwo.cards[0].photo + playerTwo.cards[1].photo; 
   }else if(handValue > 21){
     document.querySelector('.results').innerHTML = `You have busted`
-    document.querySelector('.playerTwo').innerHTML = playerTwo.cards[0].photo + playerTwo.cards[1].photo; 
-  }else{
-    document.querySelector('.results').innerHTML = `Hand Total: ${handValue}`
-    document.querySelector('.playerTwo').innerHTML = playerTwo.cards[0].photo + '<img src="card-facedown.jpg" class="playerTwo">'; 
+    document.querySelector('.player2').innerHTML = playerTwo.cards[0].photo + playerTwo.cards[1].photo; 
   }
+}
+
+function revealCards(){
+  let createdDiv =[]
+  for(let i=0; i<=2;i++){
+    createdDiv.push(document.createElement('div'));
+  }
+  createdDiv.forEach((div,index) => {
+    div.classList.add(`player${index+2}`)
+  });
+  let allHands = [playerOne.cards, playerTwo.cards,playerThree.cards,playerFour.cards];
+  allHands.forEach((hand, index) => {
+    const handLength = hand.length;
+    if(handLength <=0){
+      delete createdDiv[index-1];
+      delete hand;
+      return;
+    } else{
+      document.querySelector(`.player${index+1}`).innerHTML = hand[0].photo +`<img src="card-facedown.jpg" class="player${index+1}">`
+    }
+  });
 }
