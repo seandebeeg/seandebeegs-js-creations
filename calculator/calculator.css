@@ -1,69 +1,62 @@
-body{
-  background-color:black;
-  color:white;
-  font-family:Arial;
-}
-.calc-btn{
-  border-radius:50%;
-  height:75px;
-  width:75px;
-  font-size:30px;
-  font-weight:bold;
-  font-family:Arial;
-  margin-top:5px;
-  border:solid;
-  cursor:pointer;
-  border-color:white;
-  background-color:black;
-  color:white;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-}
-.calc-btn:hover{
-  opacity:0.8;
-  transition:opacity 0.15s;
-}
-.calc-btn:active{
-  opacity:0.6;
-  transition:opacity 0.15s;
-  transform: scale(0.9);
-  background-color: #dcdcdc;
-}
-.zero-btn{
-  margin-top:5px;
-  border-radius:50%;
-  height:75px;
-  width:75px;
-  font-size:30px;
-  font-weight:bold;
-  font-family:Arial;
-  border:solid;
-  cursor:pointer;
-  border-color:white;
-  background-color:black;
-  color:white;
-}
-.zero-btn:hover{
-  opacity:0.8;
-  transition:opacity 0.15s;
-}
-.zero-btn:active{
-  opacity:0.6;
-  transition:opacity 0.15s;
-}
-.calculator{
+body {
+  background-color: white;
+  color: black;
+  font-family: Arial, sans-serif;
   text-align: center;
+}
+
+.calculator {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   justify-content: center;
+  max-width: 300px;
+  margin: 20px auto;
+  background-color: #0047ab;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
-.equation{
-  text-align:center;
-  font-size:30px;
-  font-weight:bold;
+
+.calc-btn {
+  border-radius: 5px;
+  height: 50px;
+  width: 50px;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  background-color: #ff0000;
+  color: white;
+  transition: transform 0.2s ease, background-color 0.2s ease;
 }
-.result{
-  text-align:center;
-  font-size:30px;
-  font-weight:bold;
+
+.calc-btn:hover {
+  background-color: #cc0000;
+}
+
+.calc-btn:active {
+  transform: scale(0.95);
+}
+
+.zero-btn {
+  grid-column: span 2;
+  height: 50px;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  background-color: #ff0000;
+  color: white;
+}
+
+.equation, .result {
+  background-color: white;
+  color: black;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 2px solid black;
+  border-radius: 5px;
 }
