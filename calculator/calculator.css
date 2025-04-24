@@ -16,6 +16,7 @@ body{
   border-color:white;
   background-color:black;
   color:white;
+  transition: transform 0.2s ease, background-color 0.2s ease;
 }
 .calc-btn:hover{
   opacity:0.8;
@@ -24,6 +25,8 @@ body{
 .calc-btn:active{
   opacity:0.6;
   transition:opacity 0.15s;
+  transform: scale(0.9);
+  background-color: #dcdcdc;
 }
 .zero-btn{
   margin-top:5px;
@@ -49,6 +52,10 @@ body{
 }
 .calculator{
   text-align: center;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  justify-content: center;
 }
 .equation{
   text-align:center;

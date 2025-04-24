@@ -22,6 +22,15 @@ document.addEventListener('DOMContentLoaded', () => {
     character.style.animation = 'jiggle 0.5s infinite';
     gameContainer.appendChild(character);
 
+    // Add mouse-triggered jiggle effect
+    character.addEventListener('mouseover', () => {
+        character.style.animation = 'jiggle 0.5s';
+    });
+
+    character.addEventListener('animationend', () => {
+        character.style.animation = ''; // Reset animation to allow re-triggering
+    });
+
     // Add a button to progress the game
     const progressButton = document.createElement('button');
     progressButton.textContent = 'Next Week';
