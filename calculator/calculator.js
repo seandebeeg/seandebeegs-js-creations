@@ -12,16 +12,19 @@ function clearCalculator(){
   document.querySelector('.equation').textContent = '';
   document.querySelector('.result').textContent = '';
 }
-function solve(){
-  if(isNaN(Number(shownEquation))){
-    document.querySelector('.result').textContent = 'Error:Not Supported'
-  } else if (shownEquation === undefined){
-    document.querySelector('.result').textContent = 'Error:Undefined'
-  } else if(!isFinite(Number(eval(shownEquation)))){
-    document.querySelector('.result').textContent = 'Infinite'
-  }
-  document.querySelector('.result').textContent = `${eval(shownEquation)}`;
-  shownEquation = ''
+function solve() {
+    try {
+        const sanitizedEquation = shownEquation.replace(/[^-+*/().0-9]/g, '');
+        const result = eval(sanitizedEquation);
+        if (!isFinite(result)) {
+            document.querySelector('.result').textContent = 'Error: Infinite';
+        } else {
+            document.querySelector('.result').textContent = result;
+        }
+    } catch (error) {
+        document.querySelector('.result').textContent = 'Error';
+    }
+    shownEquation = '';
 }
 function clearSolution(){
   document.querySelector('.result').textContent='';
@@ -44,4 +47,20 @@ document.addEventListener("keydown", function(event) {
     shownEquation = shownEquation.slice(0,-3)+'**'
   }
   document.querySelector('.equation').textContent = shownEquation;
+});
+
+// Attach event listeners to buttons
+const buttons = document.querySelectorAll('.calc-btn');
+buttons.forEach(button => {
+    button.addEventListener('click', (event) => {
+        const value = event.target.getAttribute('data-value');
+        if (value === 'solve') {
+            solve();
+        } else if (value === 'clear') {
+            clearCalculator();
+        } else {
+            addNumber(value);
+            clearSolution();
+        }
+    });
 });
