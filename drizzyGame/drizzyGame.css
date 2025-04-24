@@ -1,0 +1,29 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #222;
+    color: #fff;
+    text-align: center;
+}
+#gameArea {
+    margin: 40px auto;
+    background: #333;
+    width: 600px;
+    height: 400px;
+    position: relative;
+    border: 3px solid #fff;
+    overflow: hidden;
+}
+#drizzy {
+    width: 50px;
+    height: 50px;
+    background: #4fc3f7;
+    border-radius: 50%;
+    position: absolute;
+    left: 275px;
+    top: 175px;
+    box-shadow: 0 0 10px #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+}
