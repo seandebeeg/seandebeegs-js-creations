@@ -5,10 +5,10 @@ let knownCards = new Set();
 let players = 2;
 let cardsPerPlayer = 2;
 let playerOne = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1, isTurn:true};
-let playerTwo = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:true};
-let playerThree = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:true};
-let playerFour = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:true};
-let playerFive = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:true};
+let playerTwo = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false};
+let playerThree = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false};
+let playerFour = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false};
+let playerFive = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false};
 let cards = [];
 let previousBetValue = 1;
 
@@ -41,14 +41,15 @@ function dealCards() {
     }
   }
   document.querySelector('.initial-page').innerHTML = ``
-  document.querySelector('.playerCards').innerHTML = `${playerOne.cards[0].photo} <img src ="card-facedown.jpg" class="player-cards"><br> <button onclick="flipCard()">Opening Bet:${previousBetValue}</button>`;
-  playAudio('sounds/woosh.mp3');
+  document.querySelector('.playerCards').innerHTML = `${playerOne.cards[0].photo} <img src ="card-facedown.jpg" class="player-cards"><br> <button onclick="flipCard(playerOne)">Opening Bet:${previousBetValue}</button>`;
+  playAudio('sounds/card-flip.mp3');
 }
 function flipCard(player) {
+  console.log(player)
   player.chips.oneDollar -= previousBetValue;
   previousBetValue += 1;
   if(player === playerOne){document.querySelector('.playerCards').innerHTML = `<button onclick="check(true,${previousBetValue},playerOne)" class="action-button">Meet!</button> <button onclick="check(true,${previousBetValue + 1},playerOne)" class="action-button">Raise!</button><button onclick="check(false)"class="action-button">Stand!</button><br> ${playerOne.cards[0].photo} ${playerOne.cards[1].photo}`;}
-  playAudio('sounds/woosh.mp3')
+  playAudio('sounds/card-flip.mp3')
   document.querySelector('.deck').innerHTML = '<img src="card-facedown.jpg" class="player-cards"><br>';
   checkForBust(player);
 }
@@ -162,11 +163,27 @@ function revealCards(){
 }
 
 function decideForBot(player){
-  let cardValue = getHandValue(player);
-  if(cardValue <= 11){
+  let handValue = getHandValue(player);
+  if(handValue <= 11){
     flipCard(player);
+    changeTurns();
   }else{
-    checkTurns();
+    changeTurns()
+    check(false,0,player);
     return;
+  }
+}
+
+function changeTurns(){
+  if(playerOne.isTurn){
+    playerTwo.isTurn = true
+  } else if(playerTwo.isTurn){
+    playerThree.isTurn = true
+  } else if(playerThree.isTurn){
+    playerFour.isTurn = true
+  } else if(playerFour.isTurn){
+    playerFive.isTurn = true
+  } else if(playerFive.isTurn){
+    playerOne.isTurn = true
   }
 }
