@@ -4,11 +4,11 @@ let suits = ['hearts', 'diamonds', 'spades', 'clubs'];
 let knownCards = new Set();
 let players = 2;
 let cardsPerPlayer = 2;
-let playerOne = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1, isTurn:true};
-let playerTwo = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false};
-let playerThree = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false};
-let playerFour = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false};
-let playerFive = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false};
+let playerOne = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1, isTurn:true,className:'player1'};
+let playerTwo = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false,className:'player2'};
+let playerThree = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false,className:'player3'};
+let playerFour = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false,className:'player4'};
+let playerFive = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false,className:'player5'};
 let cards = [];
 let previousBetValue = 1;
 
@@ -17,7 +17,7 @@ function dealCards() {
   while (cards.length < 52) {
     let valueGenerator = Math.floor(Math.random() * values.length);
     let suitGenerator = Math.floor(Math.random() * suits.length);
-    let cardPicture = `<img src="deck-of-cards/${values[valueGenerator]}_of_${suits[suitGenerator]}.png" class="player-cards">`;
+    let cardPicture = `<img src="deck-of-cards/${values[valueGenerator]}_of_${suits[suitGenerator]}.png">`;
     let card = { name: values[valueGenerator], suit: suits[suitGenerator], photo:cardPicture};
     let cardString = `${card.name} of ${card.suit}, ${card.photo}`;
 
@@ -41,16 +41,18 @@ function dealCards() {
     }
   }
   document.querySelector('.initial-page').innerHTML = ``
-  document.querySelector('.playerCards').innerHTML = `${playerOne.cards[0].photo} <img src ="card-facedown.jpg" class="player-cards"><br> <button onclick="flipCard(playerOne)">Opening Bet:${previousBetValue}</button>`;
+  document.querySelector('.deck').innerHTML = '<img src="card-facedown.jpg" class="deck">'
+  revealCards(false);
+  document.querySelector('.player1').innerHTML = `${playerOne.cards[0].photo} <img src ="card-facedown.jpg" class="player1"><br> <button onclick="flipCard(playerOne)">Opening Bet:${previousBetValue}</button>`;
   playAudio('sounds/card-flip.mp3');
 }
 function flipCard(player) {
-  console.log(player)
   player.chips.oneDollar -= previousBetValue;
   previousBetValue += 1;
-  if(player === playerOne){document.querySelector('.playerCards').innerHTML = `<button onclick="check(true,${previousBetValue},playerOne)" class="action-button">Meet!</button> <button onclick="check(true,${previousBetValue + 1},playerOne)" class="action-button">Raise!</button><button onclick="check(false)"class="action-button">Stand!</button><br> ${playerOne.cards[0].photo} ${playerOne.cards[1].photo}`;}
+  if(player === playerOne){
+    document.querySelector('.player1').innerHTML = `<button onclick="check(true,${previousBetValue},playerOne)" class="action-button">Meet!</button> <button onclick="check(true,${previousBetValue + 1},playerOne)" class="action-button">Raise!</button><button onclick="check(false,0,playerOne)"class="action-button">Stand!</button><br> ${playerOne.cards[0].photo} ${playerOne.cards[1].photo}`;
+  }
   playAudio('sounds/card-flip.mp3')
-  document.querySelector('.deck').innerHTML = '<img src="card-facedown.jpg" class="player-cards"><br>';
   checkForBust(player);
 }
 
@@ -77,15 +79,16 @@ function check(didHit, betValue, player) {
         document.querySelector('.results').innerHTML = 'Everyone busted!';
       }
     } else {
-      playerOne.chips.oneDollar -= betValue;
-      if (playerOne.chips.oneDollar <= 0 || playerOne.chips.oneDollar < betValue) {
+      player.chips.oneDollar -= betValue;
+      if (player.chips.oneDollar <= 0 || player.chips.oneDollar < betValue) {
         alert('You do not have enough money to bet');
       } else {
         player.cards.push(cards.shift());
         player.i++;
+        player.cards[player.i].photo =  player.cards[player.i].photo.replaceAll('>',`class="${player.className}">`)
         player.chips.oneDollar -= betValue;
         previousBetValue = betValue;
-        document.querySelector('.playerCards').innerHTML += playerOne.cards[playerOne.i].photo;
+        document.querySelector(`.${player.className}`).innerHTML += player.cards[player.i].photo;
         playerOne.cards.forEach((card, index) => { if (card === undefined) { delete playerOne.cards[index] } });
         checkForBust(playerOne);
       }
@@ -141,31 +144,43 @@ function checkForBust(player){
   }
 }
 
-function revealCards(){
-  let createdDiv =[]
-  for(let i=0; i<=2;i++){
-    createdDiv.push(document.createElement('div'));
-  }
-  createdDiv.forEach((div,index) => {
-    div.classList.add(`player${index+2}`)
-  });
-  let allHands = [playerOne.cards, playerTwo.cards,playerThree.cards,playerFour.cards];
-  allHands.forEach((hand, index) => {
-    const handLength = hand.length;
-    if(handLength <=0){
-      delete createdDiv[index-1];
-      delete hand;
-      return;
-    } else{
-      document.querySelector(`.player${index+1}`).innerHTML = hand[0].photo +`<img src="card-facedown.jpg" class="player${index+1}">`
+function revealCards(isGameEnded){
+  if(!isGameEnded){
+    let createdDiv = []
+    for(let i=0; i<4; i++){
+      createdDiv.push(document.createElement('div'));
+      createdDiv[i].classList.add(`player${i+1}`);
+      document.body.appendChild(createdDiv[i]);
     }
-  });
+    createdDiv.forEach((div,index)=>{
+      createdDiv[index].id = `${index+1}`
+    });
+    
+    let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards];
+    allHands.forEach((hand, index) => {
+      const handLength = hand.length;
+      if(handLength <= 0){
+        if(createdDiv[index]) {
+          createdDiv[index].remove();
+        }
+        delete hand;
+        return;
+      } else {
+        hand.forEach(card =>{
+          card.photo = card.photo.replaceAll(">",`class="player${index+1}">`)
+        });
+        document.body.insertBefore(document.getElementById('2'),document.getElementById('deck'))
+        document.querySelector(`.player${index+1}`).innerHTML = 
+          hand[0].photo + `<img src="card-facedown.jpg" class="player${index+1}">`;
+      }
+    });
+  }
 }
 
 function decideForBot(player){
   let handValue = getHandValue(player);
   if(handValue <= 11){
-    flipCard(player);
+    check(true,previousBetValue,player);
     changeTurns();
   }else{
     changeTurns()
@@ -177,12 +192,16 @@ function decideForBot(player){
 function changeTurns(){
   if(playerOne.isTurn){
     playerTwo.isTurn = true
+    decideForBot(playerTwo)
   } else if(playerTwo.isTurn){
     playerThree.isTurn = true
+    decideForBot(playerThree)
   } else if(playerThree.isTurn){
     playerFour.isTurn = true
+    decideForBot(playerFour)
   } else if(playerFour.isTurn){
     playerFive.isTurn = true
+    decideForBot(playerFive)
   } else if(playerFive.isTurn){
     playerOne.isTurn = true
   }
