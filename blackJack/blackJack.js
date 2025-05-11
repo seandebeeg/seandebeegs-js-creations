@@ -27,23 +27,22 @@ function dealCards() {
     }
   }
   for(let i=0; i<cardsPerPlayer; i++){
-   playerOne.cards.push(cards[i]);
-   playerTwo.cards.push(cards[i + 1]);
-   cards.splice(0,3);
-    if (players > 2) {
-      playerThree.cards.push(cards[i + 2]);
-      cards.shift();
-    } else if (players > 3) {
-      playerFour.cards.push(cards[i + 3]);
-      cards.shift();
-    } else if(players > 4){
-      playerFive.cards.push(cards[i+4])
-    }
+   playerOne.cards.push(cards.shift())
+   playerTwo.cards.push(cards.shift())
+   if(players>2){
+    playerThree.cards.push(cards.shift())
+    if(players>3){
+      playerFour.cards.push(cards.shift())
+      if(players>4){
+        playerFive.cards.push(cards.shift())
+       }
+     }
+   } 
   }
   document.querySelector('.initial-page').innerHTML = ``
   document.querySelector('.deck').innerHTML = '<img src="card-facedown.jpg" class="deck">'
   revealCards(false);
-  document.querySelector('.player1').innerHTML = `${playerOne.cards[0].photo} <img src ="card-facedown.jpg" class="player1"><br> <button onclick="flipCard(playerOne)">Opening Bet:${previousBetValue}</button>`;
+  document.querySelector('.player1').innerHTML = `${playerOne.cards[0].photo} <img src ="card-facedown.jpg" class="player1"><br> <button onclick="flipCard(playerOne)" class="action-button">Opening Bet:${previousBetValue}</button>`;
   playAudio('sounds/card-flip.mp3');
 }
 function flipCard(player) {
@@ -90,7 +89,7 @@ function check(didHit, betValue, player) {
         previousBetValue = betValue;
         document.querySelector(`.${player.className}`).innerHTML += player.cards[player.i].photo;
         playerOne.cards.forEach((card, index) => { if (card === undefined) { delete playerOne.cards[index] } });
-        checkForBust(playerOne);
+        checkForBust(player);
       }
     }
   }
@@ -120,7 +119,6 @@ function getHandValue(player){
   player.cards.forEach(card => {
     let cardValue = getCardValue(card)
     totalValue += cardValue
-    console.log(totalValue)
     if(card.name === 'ace'){
       aceCount++
     }
@@ -147,7 +145,7 @@ function checkForBust(player){
 function revealCards(isGameEnded){
   if(!isGameEnded){
     let createdDiv = []
-    for(let i=0; i<4; i++){
+    for(let i=0; i<players; i++){
       createdDiv.push(document.createElement('div'));
       createdDiv[i].classList.add(`player${i+1}`);
       document.body.appendChild(createdDiv[i]);
@@ -156,7 +154,7 @@ function revealCards(isGameEnded){
       createdDiv[index].id = `${index+1}`
     });
     
-    let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards];
+    let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards,playerFive.cards];
     allHands.forEach((hand, index) => {
       const handLength = hand.length;
       if(handLength <= 0){
