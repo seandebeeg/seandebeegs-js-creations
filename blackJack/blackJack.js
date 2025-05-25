@@ -1,14 +1,13 @@
-alert('No real money is involved in the playing of this game');
 let values = ['ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king'];
 let suits = ['hearts', 'diamonds', 'spades', 'clubs'];
 let knownCards = new Set();
 let players = 2;
 let cardsPerPlayer = 2;
-let playerOne = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1, isTurn:true,className:'player1'};
-let playerTwo = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false,className:'player2'};
-let playerThree = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false,className:'player3'};
-let playerFour = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false,className:'player4'};
-let playerFive = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false,className:'player5'};
+let playerOne = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1, isTurn:true,className:'player1',isStanding:false};
+let playerTwo = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false,className:'player2',isStanding:false};
+let playerThree = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false,className:'player3',isStanding:false};
+let playerFour = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false,className:'player4',isStanding:false};
+let playerFive = {cards:[],chips:{oneDollar:20,fiveDollar:15,tenDollar:10,twentyFiveDollar:5,fiftyDollar:2,hundredDollar:1}, i:1,isTurn:false,className:'player5',isStanding:false};
 let cards = [];
 let previousBetValue = 1;
 
@@ -60,6 +59,14 @@ function check(didHit, betValue, player) {
     console.error('Player not found :', player)
   }else{
     if (!didHit) {
+      player.isStanding = true;
+      const playerStandingStatus = {p1:playerOne.isStanding,p2:playerTwo.isStanding,p3:playerThree.isStanding,p4:playerFour.isStanding,p5:playerFive.isStanding}
+      const standingValues = Object.values(playerStandingStatus)
+      console.log(standingValues)
+      if(standingValues.includes(false)){
+        changeTurns()
+        return;
+      }
       let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards]
         .slice(0, players).map(cards => getHandValue({cards})); 
       
@@ -88,8 +95,9 @@ function check(didHit, betValue, player) {
         player.chips.oneDollar -= betValue;
         previousBetValue = betValue;
         document.querySelector(`.${player.className}`).innerHTML += player.cards[player.i].photo;
-        playerOne.cards.forEach((card, index) => { if (card === undefined) { delete playerOne.cards[index] } });
+        player.cards.forEach((card, index) => { if (card === undefined) { delete playerOne.cards[index] } });
         checkForBust(player);
+        changeTurns()
       }
     }
   }
@@ -135,13 +143,10 @@ function checkForBust(player){
   const handValue = getHandValue(player)
   if(handValue === 21){
     document.querySelector('.results').innerHTML = `You got a blackjack`
-    document.querySelector('.player2').innerHTML = playerTwo.cards[0].photo + playerTwo.cards[1].photo; 
   }else if(handValue > 21){
     document.querySelector('.results').innerHTML = `You have busted`
-    document.querySelector('.player2').innerHTML = playerTwo.cards[0].photo + playerTwo.cards[1].photo; 
   }
 }
-
 function revealCards(isGameEnded){
   if(!isGameEnded){
     let createdDiv = []
@@ -172,35 +177,48 @@ function revealCards(isGameEnded){
           hand[0].photo + `<img src="card-facedown.jpg" class="player${index+1}">`;
       }
     });
+  } else{
+     let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards,playerFive.cards];
+     allHands.forEach((hand,index) =>{
+       let playerDiv = document.getElementById(`${index+1}`)
+       document.querySelector(`player${index+1}`).innerHTML = ''
+       hand.forEach((card) =>{
+        playerDiv.innerHTML+= card.photo
+       })
+     })
   }
 }
 
-function decideForBot(player){
-  let handValue = getHandValue(player);
-  if(handValue <= 11){
-    check(true,previousBetValue,player);
-    changeTurns();
-  }else{
-    changeTurns()
-    check(false,0,player);
+function decideForBot(player) {
+  if (!player || !player.cards || player.cards.length === 0) {
+    player.isTurn = false;
     return;
   }
+  let handValue = getHandValue(player);
+  if (handValue <= 11) {
+    check(true, previousBetValue, player);
+  } else {
+    check(false, 0, player);
+  }
 }
 
-function changeTurns(){
-  if(playerOne.isTurn){
-    playerTwo.isTurn = true
-    decideForBot(playerTwo)
-  } else if(playerTwo.isTurn){
-    playerThree.isTurn = true
-    decideForBot(playerThree)
-  } else if(playerThree.isTurn){
-    playerFour.isTurn = true
-    decideForBot(playerFour)
-  } else if(playerFour.isTurn){
-    playerFive.isTurn = true
-    decideForBot(playerFive)
-  } else if(playerFive.isTurn){
-    playerOne.isTurn = true
+function changeTurns() {
+  const players = [
+    { player: playerOne, isTurn: playerOne.isTurn },
+    { player: playerTwo, isTurn: playerTwo.isTurn },
+    { player: playerThree, isTurn: playerThree.isTurn },
+    { player: playerFour, isTurn: playerFour.isTurn },
+    { player: playerFive, isTurn: playerFive.isTurn }
+  ];
+
+  const currentPlayerIndex = players.findIndex(p => p.isTurn);
+  if (currentPlayerIndex >= 0) {
+    players[currentPlayerIndex].player.isTurn = false;
+    const nextIndex = (currentPlayerIndex + 1) % players.length;
+    players[nextIndex].player.isTurn = true;
+    
+    if (players[nextIndex].player !== playerOne) {
+      setTimeout(() => decideForBot(players[nextIndex].player), 500);
+    }
   }
 }
