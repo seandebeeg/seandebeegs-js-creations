@@ -31,7 +31,7 @@ body {
 
 .player3 {
   position: absolute;
-  left: 20px;
+  left: 40px;
   top: 50%;
   transform: translateY(-50%);
   height: 150px;
@@ -41,7 +41,7 @@ body {
 
 .player4 {
   position: absolute;
-  right: 20px;
+  right: 40px;
   top: 50%;
   transform: translateY(-50%);
   height: 150px;
