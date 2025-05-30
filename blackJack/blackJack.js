@@ -51,35 +51,43 @@ function flipCard(player) {
     document.querySelector('.player1').innerHTML = `<button onclick="check(true,${previousBetValue},playerOne)" class="action-button">Meet!</button> <button onclick="check(true,${previousBetValue + 1},playerOne)" class="action-button">Raise!</button><button onclick="check(false,0,playerOne)"class="action-button">Stand!</button><br> ${playerOne.cards[0].photo} ${playerOne.cards[1].photo}`;
   }
   playAudio('sounds/card-flip.mp3')
-  checkForBust(player);
 }
 
 function check(didHit, betValue, player) {
   if(player == undefined){
     console.error('Player not found :', player)
   }else{
-    if (!didHit) {
+    if (!didHit){
+       let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards]
+        .slice(0, players).map(cards => getHandValue({cards})); 
+
       player.isStanding = true;
       const playerStandingStatus = {p1:playerOne.isStanding,p2:playerTwo.isStanding,p3:playerThree.isStanding,p4:playerFour.isStanding,p5:playerFive.isStanding}
       const standingValues = Object.values(playerStandingStatus)
-      console.log(standingValues)
+        while(standingValues.length > players){
+          standingValues.pop()
+        }
+        allHands.forEach((hand,index) =>{
+          if(hand > 21){
+            standingValues[index] = true
+          }
+        })
       if(standingValues.includes(false)){
+        console.log(standingValues)
         changeTurns()
         return;
       }
-      let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards]
-        .slice(0, players).map(cards => getHandValue({cards})); 
       
       const maxHand = Math.max(...allHands);
       const winners = allHands
         .map((value, index) => ({value, index}))
         .filter(hand => hand.value === maxHand && hand.value <= 21);
-      if (winners.length > 0|| winners.length > 1) {
-        if(winners[0].length > winners[1]){
+      if (winners.length > 0) {
+          if(winners[0].value == 21){
+            document.querySelector('.results').innerHTML = 
+           `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with a Blackjack`;  
+          }
           document.querySelector('.results').innerHTML = 
-          `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with ${maxHand}`;
-        }
-        document.querySelector('.results').innerHTML = 
           `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with ${maxHand}`;
       } else {
         document.querySelector('.results').innerHTML = 'Everyone busted!';
@@ -91,13 +99,19 @@ function check(didHit, betValue, player) {
       } else {
         player.cards.push(cards.shift());
         player.i++;
-        player.cards[player.i].photo =  player.cards[player.i].photo.replaceAll('>',`class="${player.className}">`)
+        player.cards[player.i].photo =  player.cards[player.i].photo.replaceAll('>',`class="${player.className}">`);
         player.chips.oneDollar -= betValue;
         previousBetValue = betValue;
         document.querySelector(`.${player.className}`).innerHTML += player.cards[player.i].photo;
-        player.cards.forEach((card, index) => { if (card === undefined) { delete playerOne.cards[index] } });
-        checkForBust(player);
-        changeTurns()
+        player.cards.forEach((card, index) => { 
+          if (card === undefined){ 
+            delete playerOne.cards[index]; 
+          }});
+        if(player !== playerOne){
+         decideForBot();
+       } else{
+          changeTurns();
+        }
       }
     }
   }
@@ -106,7 +120,7 @@ function check(didHit, betValue, player) {
 function playAudio(filePath){
   audio = new Audio(filePath);
   audio.play().catch(err =>{
-    console.error('Sound Error:',err)
+    console.error('Sound Error:',err);
   })
 }
 
@@ -126,27 +140,19 @@ function getHandValue(player){
 
   player.cards.forEach(card => {
     let cardValue = getCardValue(card)
-    totalValue += cardValue
+    totalValue += cardValue;
     if(card.name === 'ace'){
-      aceCount++
+      aceCount++;
     }
   });
   
   while(totalValue > 21 && aceCount >=1){
     totalValue -= 10;
-    aceCount--
+    aceCount--;
   }
   return totalValue;
 }
 
-function checkForBust(player){
-  const handValue = getHandValue(player)
-  if(handValue === 21){
-    document.querySelector('.results').innerHTML = `You got a blackjack`
-  }else if(handValue > 21){
-    document.querySelector('.results').innerHTML = `You have busted`
-  }
-}
 function revealCards(isGameEnded){
   if(!isGameEnded){
     let createdDiv = []
@@ -156,7 +162,7 @@ function revealCards(isGameEnded){
       document.body.appendChild(createdDiv[i]);
     }
     createdDiv.forEach((div,index)=>{
-      createdDiv[index].id = `${index+1}`
+      createdDiv[index].id = String(index + 1);
     });
     
     let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards,playerFive.cards];
@@ -191,7 +197,6 @@ function revealCards(isGameEnded){
 
 function decideForBot(player) {
   if (!player || !player.cards || player.cards.length === 0) {
-    player.isTurn = false;
     return;
   }
   let handValue = getHandValue(player);
@@ -216,7 +221,7 @@ function changeTurns() {
     players[currentPlayerIndex].player.isTurn = false;
     const nextIndex = (currentPlayerIndex + 1) % players.length;
     players[nextIndex].player.isTurn = true;
-    
+    console.log(nextIndex)
     if (players[nextIndex].player !== playerOne) {
       setTimeout(() => decideForBot(players[nextIndex].player), 500);
     }
