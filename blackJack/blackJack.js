@@ -58,7 +58,7 @@ function check(didHit, betValue, player) {
     console.error('Player not found :', player)
   }else{
     if (!didHit){
-       let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards]
+       let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards, playerFive.cards]
         .slice(0, players).map(cards => getHandValue({cards})); 
 
       player.isStanding = true;
@@ -76,21 +76,23 @@ function check(didHit, betValue, player) {
         console.log(standingValues)
         changeTurns()
         return;
-      }
-      
-      const maxHand = Math.max(...allHands);
-      const winners = allHands
-        .map((value, index) => ({value, index}))
-        .filter(hand => hand.value === maxHand && hand.value <= 21);
-      if (winners.length > 0) {
-          if(winners[0].value == 21){
+      } else{
+        const maxHand = Math.max(...allHands);
+        console.log(maxHand)
+        const winners = allHands
+          .map((value, index) => ({value, index}))
+          .filter(hand => hand.value === maxHand && hand.value <= 21);
+        console.log(allHands)
+        console.log(winners)
+        console.log(winners.length)
+        if (winners.length > 0) {
             document.querySelector('.results').innerHTML = 
-           `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with a Blackjack`;  
-          }
-          document.querySelector('.results').innerHTML = 
-          `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with ${maxHand}`;
-      } else {
-        document.querySelector('.results').innerHTML = 'Everyone busted!';
+              `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with ${maxHand}`;
+            revealCards(true)
+        } else if(allHands){
+          document.querySelector('.results').innerHTML = 'Everyone busted!';
+          revealCards(true)
+        }
       }
     } else {
       player.chips.oneDollar -= betValue;
@@ -186,8 +188,13 @@ function revealCards(isGameEnded){
   } else{
      let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards,playerFive.cards];
      allHands.forEach((hand,index) =>{
+        if(hand.length == 0){
+          allHands.splice(index)
+          console.error('Player Not Found', err)
+        }
        let playerDiv = document.getElementById(`${index+1}`)
-       document.querySelector(`player${index+1}`).innerHTML = ''
+       console.log(playerDiv);
+       playerDiv.innerHTML =''
        hand.forEach((card) =>{
         playerDiv.innerHTML+= card.photo
        })
