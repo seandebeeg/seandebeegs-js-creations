@@ -78,19 +78,22 @@ function check(didHit, betValue, player) {
         return;
       } else{
         const maxHand = Math.max(...allHands);
-        console.log(maxHand)
-        const winners = allHands
+        let winners = allHands
           .map((value, index) => ({value, index}))
           .filter(hand => hand.value === maxHand && hand.value <= 21);
-        console.log(allHands)
         console.log(winners)
-        console.log(winners.length)
+        const allBusts = checkForBust();
+       allBusts.forEach((bool, index) => {
+        if(!allBusts[index] && allHands[index] == winners[index].value){
+          
+        }
+       })
         if (winners.length > 0) {
             document.querySelector('.results').innerHTML = 
               `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with ${maxHand}`;
             revealCards(true)
-        } else if(allHands){
-          document.querySelector('.results').innerHTML = 'Everyone busted!';
+        } if(allBusts.includes(true)){
+          const bustedIndex = allBusts.findIndex(bool)
           revealCards(true)
         }
       }
@@ -190,7 +193,7 @@ function revealCards(isGameEnded){
      allHands.forEach((hand,index) =>{
         if(hand.length == 0){
           allHands.splice(index)
-          console.error('Player Not Found', err)
+          console.error('Player Not Found')
         }
        let playerDiv = document.getElementById(`${index+1}`)
        console.log(playerDiv);
@@ -227,10 +230,29 @@ function changeTurns() {
   if (currentPlayerIndex >= 0) {
     players[currentPlayerIndex].player.isTurn = false;
     const nextIndex = (currentPlayerIndex + 1) % players.length;
+    players.forEach((player,index)=>{
+      if(player.isStanding && nextIndex <= 5){
+        nextIndex++
+      } else if(nextIndex > 5){
+        nextIndex = 0
+      }
+    })
     players[nextIndex].player.isTurn = true;
-    console.log(nextIndex)
     if (players[nextIndex].player !== playerOne) {
       setTimeout(() => decideForBot(players[nextIndex].player), 500);
     }
   }
+}
+
+function checkForBust(){
+  let bustArray = [];
+  const allHands = [playerOne.cards, playerTwo.cards,playerThree.cards,playerFour.cards,playerFive.cards];
+  allHands.forEach(hand =>{
+    if(hand >21){
+      bustArray.push(true);
+    }else{
+      bustArray.push(false);
+    }
+  })
+  return bustArray;
 }
