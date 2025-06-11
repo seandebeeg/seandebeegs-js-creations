@@ -54,13 +54,9 @@ function flipCard(player) {
 }
 
 function check(didHit, betValue, player) {
-  if(player == undefined){
-    console.error('Player not found :', player)
-  }else{
     if (!didHit){
        let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards, playerFive.cards]
         .slice(0, players).map(cards => getHandValue({cards})); 
-
       player.isStanding = true;
       const playerStandingStatus = {p1:playerOne.isStanding,p2:playerTwo.isStanding,p3:playerThree.isStanding,p4:playerFour.isStanding,p5:playerFive.isStanding}
       const standingValues = Object.values(playerStandingStatus)
@@ -77,30 +73,36 @@ function check(didHit, betValue, player) {
         changeTurns()
         return;
       } else{
-        const maxHand = Math.max(...allHands);
+        let maxHand = Math.max(...allHands);
+        if(maxHand > 21){
+          allHands.forEach((hand,index)=>{
+            if(hand > 21){
+              allHands[index].remove()
+            }
+          })
+        }
         let winners = allHands
           .map((value, index) => ({value, index}))
           .filter(hand => hand.value === maxHand && hand.value <= 21);
-        console.log(winners)
         const allBusts = checkForBust();
-       allBusts.forEach((bool, index) => {
-        if(!allBusts[index] && allHands[index] == winners[index].value){
-          
-        }
-       })
         if (winners.length > 0) {
             document.querySelector('.results').innerHTML = 
               `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with ${maxHand}`;
             revealCards(true)
         } if(allBusts.includes(true)){
-          const bustedIndex = allBusts.findIndex(bool)
+          const bustedIndex = allBusts.findIndex(true)
+          document.querySelector('.results').innerHTML = 
+            `Player ${bustedIndex + 1} has busted`
           revealCards(true)
+          changeTurns()
         }
       }
+      changeTurns()
     } else {
       player.chips.oneDollar -= betValue;
       if (player.chips.oneDollar <= 0 || player.chips.oneDollar < betValue) {
         alert('You do not have enough money to bet');
+        changeTurns()
       } else {
         player.cards.push(cards.shift());
         player.i++;
@@ -110,14 +112,14 @@ function check(didHit, betValue, player) {
         document.querySelector(`.${player.className}`).innerHTML += player.cards[player.i].photo;
         player.cards.forEach((card, index) => { 
           if (card === undefined){ 
-            delete playerOne.cards[index]; 
-          }});
+            playerOne.cards[index].pop(); 
+          }
+        });
         if(player !== playerOne){
-         decideForBot();
-       } else{
+          decideForBot();
+        } else{
           changeTurns();
         }
-      }
     }
   }
 }
@@ -229,15 +231,18 @@ function changeTurns() {
   const currentPlayerIndex = players.findIndex(p => p.isTurn);
   if (currentPlayerIndex >= 0) {
     players[currentPlayerIndex].player.isTurn = false;
-    const nextIndex = (currentPlayerIndex + 1) % players.length;
-    players.forEach((player,index)=>{
+    let nextIndex = (currentPlayerIndex + 1) % players.length;
+    console.log(nextIndex)
+    players.forEach(player =>{
       if(player.isStanding && nextIndex <= 5){
         nextIndex++
+        console.log(nextIndex)
       } else if(nextIndex > 5){
         nextIndex = 0
       }
     })
     players[nextIndex].player.isTurn = true;
+    console.log(nextIndex)
     if (players[nextIndex].player !== playerOne) {
       setTimeout(() => decideForBot(players[nextIndex].player), 500);
     }
