@@ -12,7 +12,7 @@ let cards = [];
 let previousBetValue = 1;
 
 function dealCards() {
-  players = document.getElementById('playerCount').value;
+  players = document.getElementById('playerCount').value || players;
   while (cards.length < 52) {
     let valueGenerator = Math.floor(Math.random() * values.length);
     let suitGenerator = Math.floor(Math.random() * suits.length);
@@ -57,6 +57,7 @@ function check(didHit, betValue, player) {
     if (!didHit){
        let allHands = [playerOne.cards, playerTwo.cards, playerThree.cards, playerFour.cards, playerFive.cards]
         .slice(0, players).map(cards => getHandValue({cards})); 
+      console.log(allHands)
       player.isStanding = true;
       const playerStandingStatus = {p1:playerOne.isStanding,p2:playerTwo.isStanding,p3:playerThree.isStanding,p4:playerFour.isStanding,p5:playerFive.isStanding}
       const standingValues = Object.values(playerStandingStatus)
@@ -69,32 +70,31 @@ function check(didHit, betValue, player) {
           }
         })
       if(standingValues.includes(false)){
-        console.log(standingValues)
         changeTurns()
         return;
       } else{
         let maxHand = Math.max(...allHands);
+        console.log(maxHand)
         if(maxHand > 21){
-          allHands.forEach((hand,index)=>{
-            if(hand > 21){
-              allHands[index].remove()
+          allHands.forEach((hand, index) => {
+            if (hand > 21) {
+              allHands[index] = 1;
+              allHands.splice(index, 1);
+              console.log(allHands);
             }
           })
+           maxHand = Math.max(...allHands);
+           console.log(maxHand)
         }
         let winners = allHands
           .map((value, index) => ({value, index}))
           .filter(hand => hand.value === maxHand && hand.value <= 21);
-        const allBusts = checkForBust();
+          console.log(winners.length)
         if (winners.length > 0) {
             document.querySelector('.results').innerHTML = 
-              `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with ${maxHand}`;
+              `Winner(s): Player ${winners.map(w => w.index + 1).join(', ')} with ${maxHand}
+              <button class = "action-button" onclick = "resetGame();">Play Again</button>`;
             revealCards(true)
-        } if(allBusts.includes(true)){
-          const bustedIndex = allBusts.findIndex(true)
-          document.querySelector('.results').innerHTML = 
-            `Player ${bustedIndex + 1} has busted`
-          revealCards(true)
-          changeTurns()
         }
       }
       changeTurns()
@@ -197,10 +197,9 @@ function revealCards(isGameEnded){
           allHands.splice(index)
           console.error('Player Not Found')
         }
-       let playerDiv = document.getElementById(`${index+1}`)
-       console.log(playerDiv);
-       playerDiv.innerHTML =''
-       hand.forEach((card) =>{
+        let playerDiv = document.getElementById(`${index+1}`)
+        playerDiv.innerHTML =''
+        hand.forEach((card) =>{
         playerDiv.innerHTML+= card.photo
        })
      })
@@ -232,17 +231,14 @@ function changeTurns() {
   if (currentPlayerIndex >= 0) {
     players[currentPlayerIndex].player.isTurn = false;
     let nextIndex = (currentPlayerIndex + 1) % players.length;
-    console.log(nextIndex)
     players.forEach(player =>{
       if(player.isStanding && nextIndex <= 5){
         nextIndex++
-        console.log(nextIndex)
       } else if(nextIndex > 5){
         nextIndex = 0
       }
     })
     players[nextIndex].player.isTurn = true;
-    console.log(nextIndex)
     if (players[nextIndex].player !== playerOne) {
       setTimeout(() => decideForBot(players[nextIndex].player), 500);
     }
@@ -260,4 +256,41 @@ function checkForBust(){
     }
   })
   return bustArray;
+}
+
+function resetGame(){
+  playerOne.cards = [];
+  playerTwo.cards = [];
+  playerThree.cards = []; 
+  playerFour.cards = []; 
+  playerFive.cards = [];
+  cards = [];
+  previousBetValue = 1;
+  clearDivs()
+  restoreInitialPage()
+  dealCards()
+}
+
+function clearDivs(){
+  for (let i = 1; i <= 5; i++) {
+    const div = document.getElementById(`${i}`);
+    if (div) {
+      div.innerHTML = "";
+    }
+  }
+}
+
+function restoreInitialPage(){
+   document.querySelector('.initial-page').innerHTML =  `<div class="initial-page">
+      <h1>Pre-Game: Player Count</h1>
+      <form class="playerForm">
+        <select id="playerCount">
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+        <button type ="submit" onclick="event.preventDefault(); dealCards()">Confirm</button>
+      </form>
+      </div>`;
 }
