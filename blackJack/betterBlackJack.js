@@ -10,7 +10,8 @@ function createPlayer(className){
     chips: { oneDollar: 20, fiveDollar: 15, tenDollar: 10, twentyFiveDollar: 5, fiftyDollar: 2, hundredDollar: 1 },
     isTurn: false,
     className: className,
-    isStanding: false
+    isStanding: false,
+    i: 1
   };
 }
 
@@ -45,7 +46,7 @@ cards = buildDeck();
 shuffle(cards);
 
 function dealCards(){
-  const playersPlaying = players.length
+  const playersPlaying = playerNumber
   for(let i=0; i < playersPlaying; i++){
     players[i].cards.push(cards.shift())
     players[i].cards.push(cards.shift())
@@ -61,12 +62,11 @@ function check(didHit, betValue, player) {
 
   if (!didHit) {
     // Get all hand values for active players
-    let allHands = players.slice(0, players.length).map(p => getHandValue(p));
+    let allHands = players.slice(0, playerNumber).map(p => getHandValue(p));
     player.isStanding = true;
 
     // Get standing status for active players
-    const standingValues = players.slice(0, players.length).map(p => p.isStanding);
-
+    const standingValues = players.slice(0, playerNumber).map(p => p.isStanding);
     // Marks busted hands as standing
     allHands.forEach((hand, index) => {
       if (hand > 21) {
@@ -86,7 +86,7 @@ function check(didHit, betValue, player) {
       }
       // Find winners
       let winners = players
-        .slice(0, players.length)
+        .slice(0, playerNumber)
         .map((p, idx) => ({ value: getHandValue(p), index: idx }))
         .filter(hand => hand.value === maxHand && hand.value <= 21);
 
@@ -102,12 +102,11 @@ function check(didHit, betValue, player) {
     player.chips.oneDollar -= betValue;
     if (player.chips.oneDollar <= 0 || player.chips.oneDollar < betValue) {
       alert('You do not have enough money to bet');
+      player.isStanding = true;
       changeTurns();
     } else {
       player.cards.push(cards.shift());
       player.i++;
-      player.cards[player.i].photo = player.cards[player.i].photo.replaceAll('>', `class="${player.className}">`);
-      player.chips.oneDollar -= betValue;
       previousBetValue = betValue;
       document.querySelector(`.${player.className}`).innerHTML += player.cards[player.i].photo;
       player.cards.forEach((card, index) => {
@@ -163,14 +162,14 @@ function getHandValue(player){
 function revealCards(isGameEnded) {
   if (!isGameEnded) {
     let createdDiv = [];
-    for (let i = 0; i < players.length; i++) {
+    for (let i = 0; i < playerNumber; i++) {
       createdDiv[i] = document.createElement('div');
       createdDiv[i].classList.add(`player${i + 1}`);
       createdDiv[i].id = String(i + 1);
       document.body.appendChild(createdDiv[i]);
     }
 
-    players.slice(0, players.length).forEach((player, index) => {
+    players.slice(0, playerNumber).forEach((player, index) => {
       const handLength = player.cards.length;
       const playerDiv = document.getElementById(`${index + 1}`);
       if (handLength <= 0) {
@@ -182,7 +181,7 @@ function revealCards(isGameEnded) {
           <button onclick="check(false,0,players[0])"class="action-button">Stand!</button><br>`
         }
         playerDiv.innerHTML += player.cards.map((card, index) => {
-          if(index == 0){
+          if(index == 0 && player !== players[0]){
             return `<img src="card-facedown.jpg">`;
           }else{
             return card.photo;
@@ -192,11 +191,11 @@ function revealCards(isGameEnded) {
       }
     });
   } else {
-    players.slice(0, players.length).forEach((player, index) => {
+    players.slice(0, playerNumber).forEach((player, index) => {
       const playerDiv = document.getElementById(`${index + 1}`);
       if (player.cards.length === 0) {
-        if (playerDiv) playerDiv.innerHTML = '';
         console.error('Player Not Found');
+        return;
       } else {
         if (playerDiv) {
           playerDiv.innerHTML = '';
@@ -244,7 +243,7 @@ function changeTurns() {
 
 function checkForBust(){
   let bustArray = [];
-  const allHands = [playerOne.cards, playerTwo.cards,playerThree.cards,playerFour.cards,playerFive.cards];
+  const allHands = players.map(p => getHandValue(p));
   allHands.forEach(hand =>{
     if(hand >21){
       bustArray.push(true);
@@ -256,12 +255,17 @@ function checkForBust(){
 }
 
 function resetGame() {
-  players.forEach(player => player.cards = []);
+  players.forEach(player => {
+    player.cards = [];
+    player.isStanding = false;
+    player.i = 1;
+  });
   cards = [];
+  cards = buildDeck();
+  shuffle(cards);
   previousBetValue = 1;
   clearDivs();
   restoreInitialPage();
-  dealCards();
 }
 
 function clearDivs(){
@@ -283,7 +287,9 @@ function restoreInitialPage(){
           <option value="4">4</option>
           <option value="5">5</option>
         </select>
-        <button type ="submit" onclick="event.preventDefault(); dealCards()">Confirm</button>
+        <button type ="submit" onclick="event.preventDefault(); countPlayers();dealCards()">Confirm</button>
       </form>
       </div>`;
+      document.querySelector('.results').innerHTML = '';
+      document.querySelector('.deck').innerHTML = '';
 }
