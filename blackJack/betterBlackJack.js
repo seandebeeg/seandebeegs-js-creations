@@ -215,7 +215,7 @@ function changeTurns() {
     let nextIndex = (currentPlayerIndex + 1) % playersPlaying;
     players[nextIndex].isTurn = true;
     if (players[nextIndex] !== players[0]) {
-      setTimeout(() => decideForBot(players[nextIndex]), 500);
+       decideForBot(players[nextIndex]);
     }
   }
 }
@@ -258,13 +258,13 @@ function restoreInitialPage(){
     <div class="initial-page">
       <h1>Pre-Game: Player Count</h1>
       <form class="playerForm">
-        <select id="playerCount">
+        <select id="playerCount" class="action-button" style="padding: 10px;">
           <option value="2">2</option>
           <option value="3">3</option>
           <option value="4">4</option>
           <option value="5">5</option>
         </select>
-        <button type="submit" onclick="event.preventDefault(); dealCards()">Confirm</button>
+        <button type="submit" class="action-button" onclick="event.preventDefault(); dealCards()">Confirm</button>
       </form>
     </div>`;
 
