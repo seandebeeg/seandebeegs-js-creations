@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>War Online</title>
   <link rel="stylesheet" href="war.css">
-  <link rel="import" href="deck-of-cards.zip">
 </head>
 <body>
   <div class="selector" id="selector">
@@ -17,7 +16,7 @@
         <option value="4">4</option>
         <option value="5">5</option>
       </select>
-      <button onclick="calculateCardsPerPlayer(); event.preventDefault(); dealCards();" type="submit">Generate Game</button>
+      <button onclick=" event.preventDefault(); calculateCardsPerPlayer(); dealCards();" type="submit">Generate Game</button>
     </form>
   </div>
   <div class="pile"></div><br>
