@@ -1,13 +1,13 @@
 let knownCards = new Set();
 let previousBetValue = 1;
-let playerNumber;
-
+let playerNumber = 2;
+let cardsPerPlayer;
 function calculateCardsPerPlayer(){
   playerNumber = document.getElementById('player').value;
-  cardsPerPlayer = parseInt(52 / playerNumber);
+  cardsPerPlayer = Math.floor(52 / playerNumber);
 }
 
-let cardsPerPlayer = calculateCardsPerPlayer();
+cardsPerPlayer = calculateCardsPerPlayer();
 
 function createPlayer(className){
   return {
@@ -53,8 +53,9 @@ let cards = buildDeck();
 shuffle(cards);
 
 function dealCards(){
-  players.forEach(player => {
-    for(let i = 0; i <= cardsPerPlayer; i++){
+  players.forEach((player,index) => {
+    if(index + 1 > playerNumber) return;
+    for(let i = 0; i < cardsPerPlayer; i++){
       player.cards.push(cards.shift());
     }
   });
@@ -78,15 +79,15 @@ function createDivs(){
 function flipCard(existingWarPile = []){
   const activePlayers = players.slice(0, playerNumber);
   let pile = [];
-  pile = activePlayers.forEach(p => p.cards.shift());
+  activePlayers.forEach(p => pile.push(p.cards.shift()));
   const cardValues = activePlayers.map(p => getCardValue(p));
   const maxCard = Math.max(...cardValues);
   let winners = activePlayers
     .map((p, idx) => ({ value: cardValues[idx], index: idx }))
     .filter(card => card.value === maxCard);
-  if (winners.length > 1) {
-    let warCards = existingWarPile || [];
-    let warPile = [];
+  if (winners.length > 1){
+    let warCards = [];
+    let warPile = existingWarPile || [];
     pile.forEach(card => warPile.push(pile.shift()));
     winners.forEach(w => {
       const player = players[w.index];
@@ -98,7 +99,7 @@ function flipCard(existingWarPile = []){
           }
         });
         warCards.push({ value: getCardValue(player), index: w.index });
-      } else {
+      } else{
         warCards.push({ value: -1, index: w.index });
         player.cards.forEach(card => warPile.push(player.cards.shift()));
         //I'll update the HTML to show the player lost
@@ -108,25 +109,42 @@ function flipCard(existingWarPile = []){
     const warMaxCard = Math.max(...warCards.map(w => w.value));
     const warWinners = warCards.filter(w => w.value === warMaxCard);
 
-    if (warWinners.length === 1) {
+    if (warWinners.length === 1){
       const winnerIdx = warWinners[0].index;
       warPile.forEach(card => players[winnerIdx].cards.push(card));
       // I will update the html later
-    } else {
+    } else{
       flipCard(warPile);
     }
-  } else {
+  } else{
     const winnerIdx = winners[0].index;
     pile.forEach(card => players[winnerIdx].cards.push(pile.shift()));
     // I update the html to show the win later
   }
 }
 
-function getCardValue(player) {
+function getCardValue(player){
   const card = player.cards[0];
   if (card.name === 'ace') return 14;
   else if (card.name === 'king') return 13;
   else if (card.name === 'queen') return 12;
   else if (card.name === 'jack') return 11;
   else return parseInt(card.name);
+}
+
+function checkForLoss(){
+  let loserArray = [];
+  players.forEach((player, index) => {
+    if(player.cards.length <= 0){
+      document.querySelector('.result').innerHTML = `Player ${index+1} has lost`
+      loserArray.push(player)
+    }
+  })
+  if(loserArray.length === playerNumber - 1){
+    let winner = [];
+    winner = players
+    .slice(0,playerNumber)
+    .map((p,idx) => ({length: p.cards.length, idx}))
+    .filter(number => number > 0 && number == 52);
+  }
 }
