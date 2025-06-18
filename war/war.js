@@ -85,7 +85,7 @@ function flipCard(existingWarPile = []){
   let winners = activePlayers
     .map((p, idx) => ({ value: cardValues[idx], index: idx }))
     .filter(card => card.value === maxCard);
-  if (winners.length > 1){
+  if (winners.length > 1){ //war management
     let warCards = [];
     let warPile = existingWarPile || [];
     pile.forEach(card => warPile.push(pile.shift()));
@@ -102,7 +102,7 @@ function flipCard(existingWarPile = []){
       } else{
         warCards.push({ value: -1, index: w.index });
         player.cards.forEach(card => warPile.push(player.cards.shift()));
-        //I'll update the HTML to show the player lost
+        document.querySelector('.result').innerHTML = `Player has lost `
       }
     });
 
@@ -113,17 +113,26 @@ function flipCard(existingWarPile = []){
       const winnerIdx = warWinners[0].index;
       warPile.forEach(card => players[winnerIdx].cards.push(card));
       // I will update the html later
-    } else{
+    } else{ // recursive war
       flipCard(warPile);
     }
-  } else{
+  } else{ //single winner
     const winnerIdx = winners[0].index;
+    pile.forEach((card, index) => {
+      if(index+1 !== 1){
+        document.getElementById(`${index+1}`).innerHTML = card.photo;
+      } else{
+        document.getElementById('1').innerHTML =  `${card.photo}<br> 
+          <button class="flip-button" onclick="flipCard()">Flip Card</button>
+        `;
+      }
+    });
     pile.forEach(card => players[winnerIdx].cards.push(pile.shift()));
-    // I update the html to show the win later
+    checkForLosers()
   }
 }
 
-function getCardValue(player){
+function getCardValue(player = {}){
   const card = player.cards[0];
   if (card.name === 'ace') return 14;
   else if (card.name === 'king') return 13;
@@ -132,9 +141,10 @@ function getCardValue(player){
   else return parseInt(card.name);
 }
 
-function checkForLoss(){
+function checkForLosers(){
   let loserArray = [];
-  players.forEach((player, index) => {
+  const activePlayers = players.slice(0, playerNumber)
+  activePlayers.forEach((player, index) => {
     if(player.cards.length <= 0){
       document.querySelector('.result').innerHTML = `Player ${index+1} has lost`
       loserArray.push(player)
