@@ -80,7 +80,7 @@ function flipCard(existingWarPile = []){
   const activePlayers = players.slice(0, playerNumber);
   let pile = [];
   activePlayers.forEach(p => pile.push(p.cards.shift()));
-  const cardValues = activePlayers.map(p => getCardValue(p));
+  const cardValues = pile.map(card => getCardValue(card));
   const maxCard = Math.max(...cardValues);
   let winners = activePlayers
     .map((p, idx) => ({ value: cardValues[idx], index: idx }))
@@ -88,21 +88,24 @@ function flipCard(existingWarPile = []){
   if (winners.length > 1){ //war management
     let warCards = [];
     let warPile = existingWarPile || [];
-    pile.forEach(card => warPile.push(pile.shift()));
+    warPile.push(...pile);
     winners.forEach(w => {
       const player = players[w.index];
-      if (player.cards.length >= 4) {
-        player.cards.forEach(card =>{
-          for(let i = 0; i <= 3; i++){
-            warPile.push(card);
-            player.cards.splice(i);
-          }
-        });
-        warCards.push({ value: getCardValue(player), index: w.index });
-      } else{
+      if (player.cards.length >= 4){
+        let warCardSet = [];
+        for(let i = 0; i < 4; i++) {
+          let card = player.cards.shift();
+          warCardSet.push(card);
+        }
+        let warCardValue = getCardValue(warCardSet[warCardSet.length - 1]);
+        warPile.push(...warCardSet);
+        warCards.push({ value: warCardValue, index: w.index });
+      } else {
         warCards.push({ value: -1, index: w.index });
-        player.cards.forEach(card => warPile.push(player.cards.shift()));
-        document.querySelector('.result').innerHTML = `Player has lost `
+        while(player.cards.length > 0){
+          warPile.push(player.cards.shift());
+        }
+        document.querySelector('.result').innerHTML = `Player ${w.index + 1} has lost`;
       }
     });
 
@@ -117,6 +120,7 @@ function flipCard(existingWarPile = []){
       flipCard(warPile);
     }
   } else{ //single winner
+    console.log(winners);
     const winnerIdx = winners[0].index;
     pile.forEach((card, index) => {
       if(index+1 !== 1){
@@ -127,13 +131,12 @@ function flipCard(existingWarPile = []){
         `;
       }
     });
-    pile.forEach(card => players[winnerIdx].cards.push(pile.shift()));
-    checkForLosers()
+    players[winnerIdx].cards.push(...pile);
+    checkForLosers();
   }
 }
 
-function getCardValue(player = {}){
-  const card = player.cards[0];
+function getCardValue(card = {}){
   if (card.name === 'ace') return 14;
   else if (card.name === 'king') return 13;
   else if (card.name === 'queen') return 12;
