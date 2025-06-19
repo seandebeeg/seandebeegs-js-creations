@@ -1,7 +1,6 @@
-let knownCards = new Set();
-let previousBetValue = 1;
 let playerNumber = 2;
 let cardsPerPlayer;
+
 function calculateCardsPerPlayer(){
   playerNumber = document.getElementById('player').value;
   cardsPerPlayer = Math.floor(52 / playerNumber);
@@ -79,7 +78,13 @@ function createDivs(){
 function flipCard(existingWarPile = []){
   const activePlayers = players.slice(0, playerNumber);
   let pile = [];
-  activePlayers.forEach(p => pile.push(p.cards.shift()));
+  activePlayers.forEach(p => {
+    if(p.cards.length <= 0){
+      pile.push({name:'-1'});
+    } else{
+      pile.push(p.cards.shift());
+    }
+  });
   const cardValues = pile.map(card => getCardValue(card));
   const maxCard = Math.max(...cardValues);
   let winners = activePlayers
@@ -114,24 +119,38 @@ function flipCard(existingWarPile = []){
 
     if (warWinners.length === 1){
       const winnerIdx = warWinners[0].index;
-      warPile.forEach(card => players[winnerIdx].cards.push(card));
-      // I will update the html later
+      warPile.forEach(card =>{
+        if(card.value !== -1){
+          players[winnerIdx].cards.push(card);
+        }
+      });
+      document.querySelector('.result').innerHTML = `Player ${winnerIdx+1} has won the war`;
+      setTimeout( function() { //shows war cards *INCOMPLETE*
+        winners.forEach((w, index) =>{
+          
+        })
+      },250);
     } else{ // recursive war
       flipCard(warPile);
     }
   } else{ //single winner
-    console.log(winners);
     const winnerIdx = winners[0].index;
     pile.forEach((card, index) => {
-      if(index+1 !== 1){
+      if(index + 1 !== 1 && players[index].cards.length > 0){
         document.getElementById(`${index+1}`).innerHTML = card.photo;
-      } else{
+      }else if(players[index].cards.length > 0 && index+1 == 1){
         document.getElementById('1').innerHTML =  `${card.photo}<br> 
           <button class="flip-button" onclick="flipCard()">Flip Card</button>
         `;
+      }else if(players[index].cards.length === 0 && index + 1 === 1){
+        document.getElementById('1').innerHTML ='<button class="flip-button" onclick="flipCard()">Flip Card</button> <button class="player-selection" onclick="playAgain();">Play Again</button>';
       }
     });
-    players[winnerIdx].cards.push(...pile);
+    pile.forEach(card =>{
+      if(card.value !== -1){
+        players[winnerIdx].cards.push(card);
+      }
+    });
     checkForLosers();
   }
 }
@@ -149,15 +168,43 @@ function checkForLosers(){
   const activePlayers = players.slice(0, playerNumber)
   activePlayers.forEach((player, index) => {
     if(player.cards.length <= 0){
-      document.querySelector('.result').innerHTML = `Player ${index+1} has lost`
-      loserArray.push(player)
+      document.querySelector('.result').innerHTML = `Player ${index+1} has lost`;
+      loserArray.push(player);
     }
   })
   if(loserArray.length === playerNumber - 1){
     let winner = [];
     winner = players
-    .slice(0,playerNumber)
-    .map((p,idx) => ({length: p.cards.length, idx}))
-    .filter(number => number > 0 && number == 52);
+      .slice(0,playerNumber)
+      .map((p,idx) => ({length: p.cards.length, idx}))
+      .filter(p => p.idx > 0 && p.idx == 52);
+    document.querySelector('.result').innerHTML = `Player ${winner[0].idx + 1} has won the game <br><button class="player-selection" onclick="playAgain()"> Play Again</button>`;
   }
+}
+
+function restoreSelectionPage(){
+  document.body.innerHTML = `
+  <div class="selector" id="selector">
+    <form>
+      <p class="player-count">Pre Game: Player Count</p>
+      <select id="player" class="player-selection">
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+      <button onclick="event.preventDefault(); calculateCardsPerPlayer(); dealCards(); createDivs();" type="submit" class="player-selection">Generate Game</button>
+    </form>
+  </div>
+  <div class="result"></div>
+  <script src="war.js"></script>
+  `;
+}
+
+function playAgain(){
+  players.forEach(p => {
+    p.cards = [];
+  });
+  cards = [];
+  restoreSelectionPage();
 }
