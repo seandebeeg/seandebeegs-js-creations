@@ -33,7 +33,7 @@ body {
   position: absolute;
   left: 100px;
   top: 50%;
-  transform: translateY(-50%) ;
+  transform: translateY(-50%) rotate(90deg);
   height: 150px;
   max-width: 300px;
   z-index: 2;
@@ -42,8 +42,8 @@ body {
 .player4 {
   position: absolute;
   right: 100px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 60%;
+  transform: translateY(-50%) rotate(90deg);
   height: 150px;
   max-width: 300px;
   z-index: 2;
@@ -53,7 +53,7 @@ body {
   position: absolute;
   right: 100px;
   top: 50%;
-  transform: translateY(-175%) rotate(300deg);
+  transform: translateY(-175%) rotate(315deg);
   height: 150px;
   max-width: 300px;
   z-index: 2;
