@@ -1,20 +1,11 @@
 let knownCards = new Set();
 let cardsPerPlayer = 2;
 let cards = [];
-let previousBetValue = 1;
 let playerNumber;
 
 function createPlayer(className){
   return {
     cards: [],
-    chips: {
-      oneDollar: 20,
-      fiveDollar: 15,
-      tenDollar: 10,
-      twentyFiveDollar: 5,
-      fiftyDollar: 2,
-      hundredDollar: 1
-    },
     isTurn: false,
     className: className,
     isStanding: false,
@@ -29,6 +20,7 @@ let players = [
   createPlayer('player4'),
   createPlayer('player5')
 ];
+
 players[0].isTurn = true;
 
 function countPlayers(){
@@ -69,10 +61,10 @@ function dealCards(){
   document.querySelector('.initial-page').innerHTML = '';
   document.querySelector('.deck').innerHTML = '<img src="card-facedown.jpg" class="deck">';
   playAudio('sounds/card-flip.mp3');
-  revealCards(false);
+  revealCards();
 }
 
-function check(didHit, betValue, player){
+function check(didHit, player){
   if (!didHit) {
     // Get all hand values for active players
     let allHands = players.slice(0, playerNumber).map(p => getHandValue(p));
@@ -106,21 +98,14 @@ function check(didHit, betValue, player){
       }
     }
     changeTurns();
-  } else {
-    player.chips.oneDollar -= betValue;
-    if (player.chips.oneDollar <= 0 || player.chips.oneDollar < betValue) {
-      alert('You do not have enough money to bet');
-      changeTurns();
-    } else {
-      player.cards.push(cards.shift());
-      player.i++;
-      if (player !== players[0]) {
-        decideForBot(player);
-      } else {
-        changeTurns();
-      }
-    }
+  } 
+  else {
+    player.cards.push(cards.shift());
+    player.i++;
+    if (player !== players[0]) decideForBot(player);
+    else changeTurns();
   }
+  revealCards();
 }
 
 function playAudio(filePath){
@@ -139,6 +124,7 @@ function getCardValue(card) {
 function getHandValue(player){
   let totalValue = 0;
   let aceCount = 0;
+
   player.cards.forEach(card => {
     let value = getCardValue(card);
     totalValue += value;
@@ -152,7 +138,7 @@ function getHandValue(player){
   return totalValue;
 }
 
-function revealCards(isGameEnded) {
+function revealCards(isGameEnded = false) {
   if (!isGameEnded) {
     let createdDiv = [];
     for (let i = 0; i < playerNumber; i++) {
@@ -167,43 +153,35 @@ function revealCards(isGameEnded) {
       if (player.cards.length <= 0) {
         playerDiv.innerHTML = '';
       } else {
-        if(playerDiv.id == '1'){
-          playerDiv.innerHTML =  `<button onclick="check(true,${previousBetValue},players[0])" class="action-button">Meet!</button> 
-          <button onclick="check(true,${previousBetValue + 1},players[0])" class="action-button">Raise!</button>
-          <button onclick="check(false,0,players[0])"class="action-button">Stand!</button><br>`
-        }
-        playerDiv.innerHTML += player.cards.map((card, index) => {
-          if(index == 0 && player !== players[0]){
-            return `<img src="card-facedown.jpg">`;
-          }else{
-            return card.photo;
+          playerDiv.innerHTML = '';
+          if(playerDiv.id == '1'){
+            playerDiv.innerHTML =  `
+              <button onclick="check(true,players[0])" class="action-button">Hit!</button> 
+              <button onclick="check(false,players[0])"class="action-button">Stand!</button><br>
+            `;
           }
-        })
-        .join('');
+          playerDiv.innerHTML += player.cards.map((card, index) => {
+            if(index == 0 && player !== players[0]) return `<img src="card-facedown.jpg">`;
+            else return card.photo;
+          }).join('');
       }
     });
   } else {
-    players.slice(0, playerNumber).forEach((player, index) => {
-      const playerDiv = document.getElementById(`${index + 1}`);
-      if (player.cards.length === 0) {
-        if (playerDiv) playerDiv.innerHTML = '';
-      } else {
-        if (playerDiv) {
-          playerDiv.innerHTML = player.cards.map(card => card.photo).join('');
-        }
-      }
-    });
-  }
+      players.slice(0, playerNumber).forEach((player, index) => {
+        const playerDiv = document.getElementById(`${index + 1}`);
+        if (player.cards.length === 0 && playerDiv) playerDiv.innerHTML = '';
+        else if (player.cards.lenght !== 0) playerDiv.innerHTML = player.cards.map(card => card.photo).join('');
+      });
+    }
 }
 
 function decideForBot(player) {
-  if (!player || !player.cards || player.cards.length === 0) return;
+  if (!player || !player.cards) return;
+
   let handValue = getHandValue(player);
-  if (handValue <= 15) {
-    setTimeout(() => check(true, previousBetValue, player), 500);
-  } else {
-    setTimeout(() => check(false, 0, player), 500);
-  }
+
+  if (handValue < 15) setTimeout(() => check(true, player), 250);
+  else setTimeout(() => check(false, player), 250);
 }
 
 function changeTurns() {
@@ -237,11 +215,11 @@ function resetGame() {
     player.isTurn = false;
     player.i = 1;
   });
+  players[0].isTurn = true;
 
   cards = [];
   cards = buildDeck();
   shuffle(cards);
-  previousBetValue = 1;
   clearDivs();
   restoreInitialPage();
 }
@@ -266,9 +244,9 @@ function restoreInitialPage(){
         </select>
         <button type="submit" class="action-button" onclick="event.preventDefault(); dealCards()">Confirm</button>
       </form>
-    </div>`;
+    </div>`
+  ;
 
   document.querySelector('.results').innerHTML = '';
   document.querySelector('.deck').innerHTML = '';
 }
-
